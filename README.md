@@ -1,5 +1,3 @@
-[Video Demo of Test Cases](https://www.youtube.com/watch?v=4yG2YBAsaYY) 
-
 Note: 複雑な所は、polymorphism, recursion, and chain of responsibilityの実装である。理解できないなら、
 それぞれの概念を学ぶ必要があるかもしれない。使っているところでコメントを残しているので、それを参考にしてください。
 
@@ -34,6 +32,7 @@ const chain = new LinkChain([new ErrorLink(), new AuthLink(errorData), new HttpL
 3. const errorData = { isThrowAuthError: false };　// エラーを発生させない場合
 結果: AuthLinkがエラーを投げないため、HttpLinkが実行される。
 
+[Video Demo of Test Cases](https://www.youtube.com/watch?v=4yG2YBAsaYY) 
 
 ``` 
 // 再帰的な処理が理解できない場合は、以下の主なアイデアを参考にしてください:
