@@ -1,4 +1,4 @@
-// Note: 複雑な所は、polymorphism, recursion,　and chain of responsibilityの実装である。理解できないなら、
+// Note: 複雑な所は、polymorphism, recursion, and chain of responsibilityの実装である。理解できないなら、
 // それぞれの概念を学ぶ必要があるかもしれない。使っているところでコメントを残しているので、それを参考にしてください。
 
 // メーンポイント
@@ -9,11 +9,14 @@
 // AuthLinkがエラーを投げる設定になっているため、ErrorLinkがそのエラーをキャッチし、エラーメッセージを返す。
 // 最後に、結果がコンソールに出力される。
 
+// 再帰的な処理
 // executeChain関数は再帰的です。次のインデックスで自分自身を呼び出すことで、チェーン内の各リンクを処理します。
 // AuthLinkがエラーを投げると、そのエラーはコールスタックを通じて前の関数呼び出し（ErrorLink）に伝播します。
-// これは、ErrorLinkのtry-catchブロックでエラーがキャッチされるまで、コールスタック内のすべての関数に当てはまります。
-// これが、他のリンクが投げるエラーをキャッチしたい場合に、ErrorLinkをチェーンの最初に配置する必要がある理由です。
-// 基本的に、ErrorLinkはすべてのforward呼び出しをtry-catchブロックでラップして、後続のリンクが投げるエラーを処理します。
+// ErrorLinkのtry-catchブロックでエラーがキャッチされるまで、コールスタック内のすべての関数に当てはまります。
+// 他のリンクが投げるエラーをキャッチしたい場合に、ErrorLinkをそのチェーンの最初に配置する必要がある理由です。
+// 基本的に、ErrorLinkはすべてのforwardコールをtry-catchブロックでラップして、後続のリンクが投げるエラーを処理します。
+
+// Chair of Responsibilityパターン
 // これは、Chain of Responsibilityパターンの一例です。各リンクはOperationオブジェクトを処理し、次のリンクに渡します。
 
 // 例のケース
@@ -103,7 +106,7 @@ try{
 const result = chain.execute(operation);
 // チェーン内でエラーが発生した場合、エラーをキャッチしてログに出力する
 if (result && result.error)
-  console.log(`[Main] Error handled: ${result.error}`);
+  console.log(`[Main] Error safely handled: ${result.error}`);
 else
   console.log(`[Main] Result: ${JSON.stringify(result)}`);
 } catch(error){
@@ -113,17 +116,3 @@ else
 };
 
 main();
-
-// The executeChain function is recursive. It processes each link in the chain by calling itself with the next index.
-// When AuthLink throws an error, the error propagates back through the call stack to the previous function call, which is ErrorLink.
-// This is true for all functions in the call stack until the error is caught by the try-catch block in ErrorLink. 
-// This is why ErrorLink should come first in the chain if you wish to catch errors thrown by other links.
-// Essentially, ErrorLink wraps all the forward call in a try-catch block to handle any errors thrown by subsequent links.
-// This is the chain of responsibility pattern in action. Each link is responsible for handling a specific operation and passing it to the next link in the chain.
-
-// executeChain関数は再帰的です。次のインデックスで自分自身を呼び出すことで、チェーン内の各リンクを処理します。
-// AuthLinkがエラーを投げると、そのエラーはコールスタックを通じて前の関数呼び出し（ErrorLink）に伝播します。
-// これは、ErrorLinkのtry-catchブロックでエラーがキャッチされるまで、コールスタック内のすべての関数に当てはまります。
-// これが、他のリンクが投げるエラーをキャッチしたい場合に、ErrorLinkをチェーンの最初に配置する必要がある理由です。
-// 基本的に、ErrorLinkはすべてのforward呼び出しをtry-catchブロックでラップして、後続のリンクが投げるエラーを処理します。
-// これは、Chain of Responsibilityパターンの一例です。各リンクはOperationオブジェクトを処理し、次のリンクに渡します。

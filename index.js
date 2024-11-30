@@ -1,9 +1,5 @@
-// このファイルは、責任の連鎖（Chain of Responsibility）パターンを示している。
-// 各リンク（AuthLink、ErrorLink、HttpLink）は、Operationオブジェクトを処理し、次のリンクに渡す。
-// LinkChainクラスは、これらのリンクを順番に実行する役割を持つ。
-// main関数では、AuthLink、ErrorLink、HttpLinkの順にリンクを設定し、Operationを実行する。
-// AuthLinkがエラーを投げる設定になっているため、ErrorLinkがそのエラーをキャッチし、エラーメッセージを返す。
-// 最後に、結果がコンソールに出力される。
+// Note: 複雑な所は、polymorphism, recursion, and chain of responsibilityの実装である。理解できないなら、
+// それぞれの概念を学ぶ必要があるかもしれない。使っているところでコメントを残しているので、それを参考にしてください。
 var ErrorLink = /** @class */ (function () {
     function ErrorLink() {
     }
@@ -52,9 +48,9 @@ var LinkChain = /** @class */ (function () {
         var executeChain = function (index, op) {
             if (index >= _this.links.length)
                 return null;
-            var link = _this.links[index]; // [(0) errorLink , (1) authLink , (2) httpLink]
-            var forward = function (nextOp) { return executeChain(index + 1, nextOp); };
-            return link.execute(op, forward); // ポリモーフィズムで各リンクのexecuteメソッドが呼ばれる
+            var link = _this.links[index]; // 例: [(0) errorLink , (1) authLink , (2) httpLink]
+            var forward = function (nextOp) { return executeChain(index + 1, nextOp); }; //次のリンクに処理を渡すための再帰的なコールバック
+            return link.execute(op, forward); //ポリモーフィズムで各リンクのexecuteメソッドが呼ばれる
         };
         return executeChain(0, operation);
     };
@@ -63,17 +59,43 @@ var LinkChain = /** @class */ (function () {
 // Main - チェーンの実行
 var main = function () {
     var errorData = { isThrowAuthError: false }; // ここでエラーを発生させるかどうかを設定する
-    var chain = new LinkChain([new ErrorLink(), new AuthLink(errorData), new HttpLink()]);
+    var chain = new LinkChain([new ErrorLink(), new AuthLink(errorData), new HttpLink()]); // チェーンの設定
     var operation = { query: "Some GraphQL Query" };
     try {
         var result = chain.execute(operation);
+        // チェーン内でエラーが発生した場合、エラーをキャッチしてログに出力する
         if (result && result.error)
-            console.log("[Main] Error handled: ".concat(result.error));
+            console.log("[Main] Error safely handled: ".concat(result.error));
         else
             console.log("[Main] Result: ".concat(JSON.stringify(result)));
     }
     catch (error) {
+        // チェーン内でエラーがキャッチされなかった場合、エラーをキャッチしてログに出力する。
         console.error("[Main]: Error was not handled in LinkChain and propagated to main. Error: ".concat(error.message));
     }
 };
 main();
+// Forwarding links in a chain of responsibility
+// First link in the chain
+function errorLinkExecute(op) {
+    // Start of the chain
+    try {
+        authLinkExecute(op); // Forward to the next link
+    }
+    catch (error) {
+        console.log(error); // Handle any errors thrown by downstream links
+    }
+}
+// Second link in the chain
+function authLinkExecute(op) {
+    // Perform authentication logic
+    // ...
+    httpLinkExecute(op); // Forward to the next link
+}
+// Third link in the chain
+function httpLinkExecute(op) {
+    // Send request to server and wait for response
+}
+// Start the chain
+var operation = { query: "Some GraphQL Query" };
+errorLinkExecute(operation);
