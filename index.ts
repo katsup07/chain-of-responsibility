@@ -31,7 +31,7 @@
 
 // 3. const errorData = { isThrowAuthError: false };　// エラーを発生させない場合
 // 結果: AuthLinkがエラーを投げないため、HttpLinkが実行される。
-
+// Video - https://www.youtube.com/watch?v=4yG2YBAsaYY
 
 interface Operation {
   query: string;
