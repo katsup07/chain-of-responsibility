@@ -58,7 +58,7 @@ var LinkChain = /** @class */ (function () {
 }());
 // Main - チェーンの実行
 var main = function () {
-    var errorData = { isThrowAuthError: false }; // ここでエラーを発生させるかどうかを設定する
+    var errorData = { isThrowAuthError: true }; // ここでエラーを発生させるかどうかを設定する
     var chain = new LinkChain([new ErrorLink(), new AuthLink(errorData), new HttpLink()]); // チェーンの設定
     var operation = { query: "Some GraphQL Query" };
     try {
@@ -75,27 +75,3 @@ var main = function () {
     }
 };
 main();
-// Forwarding links in a chain of responsibility
-// First link in the chain
-function errorLinkExecute(op) {
-    // Start of the chain
-    try {
-        authLinkExecute(op); // Forward to the next link
-    }
-    catch (error) {
-        console.log(error); // Handle any errors thrown by downstream links
-    }
-}
-// Second link in the chain
-function authLinkExecute(op) {
-    // Perform authentication logic
-    // ...
-    httpLinkExecute(op); // Forward to the next link
-}
-// Third link in the chain
-function httpLinkExecute(op) {
-    // Send request to server and wait for response
-}
-// Start the chain
-var operation = { query: "Some GraphQL Query" };
-errorLinkExecute(operation);

@@ -42,11 +42,11 @@ type NextLink = (operation: Operation) => any;
 // ポリモーフィズムをつかうため、Linkインターフェースを作成する。
 // 各Linkクラスはこのインターフェースを実装する
 interface Link {
-  execute(operation: Operation, forward: NextLink): any;
+  execute(operation: Operation, forward: NextLink);
 }
 
 class ErrorLink implements Link {
-  execute(operation: Operation, forward: NextLink): any {
+  execute(operation: Operation, forward: NextLink) {
     console.log("[ErrorLink] Running execute...");
     try {
       //　次のリンクに処理を渡す
@@ -61,7 +61,7 @@ class ErrorLink implements Link {
 class AuthLink implements Link {
   constructor(private data: { isThrowAuthError: boolean}) {}
 
-  execute(operation: Operation, forward: NextLink): any {
+  execute(operation: Operation, forward: NextLink) {
     console.log("[AuthLink] Running execute...");
     // わざとエラーを発生させる
     if(this.data.isThrowAuthError)
@@ -72,7 +72,7 @@ class AuthLink implements Link {
 }
 
 class HttpLink implements Link {
-  execute(operation: Operation, forward: NextLink): any {
+  execute(operation: Operation, forward: NextLink) {
     console.log(`[HttpLink]: Request sent with query "${operation.query}"`);
     return { data: "Query was processed successfully" };
   }
@@ -81,8 +81,8 @@ class HttpLink implements Link {
 class LinkChain {
   constructor(private links: Link[]) {}
 
-  execute(operation: Operation): any {
-    const executeChain = (index: number, op: Operation): any => {
+  execute(operation: Operation) {
+    const executeChain = (index: number, op: Operation) => {
       if (index >= this.links.length) return null;
 
       const link = this.links[index]; // 例: [(0) errorLink , (1) authLink , (2) httpLink]
@@ -97,7 +97,7 @@ class LinkChain {
 // Main - チェーンの実行
 const main = () => {
 
-const errorData = { isThrowAuthError: false }; // ここでエラーを発生させるかどうかを設定する
+const errorData = { isThrowAuthError: true }; // ここでエラーを発生させるかどうかを設定する
 const chain = new LinkChain([new ErrorLink(), new AuthLink(errorData), new HttpLink()]); // チェーンの設定
 
 const operation = { query: "Some GraphQL Query" };
