@@ -104,9 +104,9 @@ const operation = { query: "Some GraphQL Query" };
 
 try{
 const result = chain.execute(operation);
-// チェーン内でエラーが発生した場合、エラーをキャッチしてログに出力する
+// チェーン内でエラーが発生した場合、チェーン内でエラーをキャッチしてresultをログに出力する
 if (result && result.error)
-  console.log(`[Main] Error safely handled: ${result.error}`);
+  console.log(`[Main] Error handled in LinkChain: ${result.error}`);
 else
   console.log(`[Main] Result: ${JSON.stringify(result)}`);
 } catch(error){
