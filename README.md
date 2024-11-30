@@ -1,4 +1,4 @@
-
+[Watch the video](https://www.youtube.com/watch?v=4yG2YBAsaYY) 
 
 ``` 
 // 主なアイデア
