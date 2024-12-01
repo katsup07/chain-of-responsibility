@@ -13,6 +13,8 @@
 // ErrorLinkのtry-catchブロックでエラーがキャッチされるまで、コールスタック内のすべての関数に当てはまる。
 // 他のリンクが投げるエラーをキャッチしたい場合、ErrorLinkをチェーンの最初に配置する必要がある。
 // 基本的に、ErrorLinkはすべてのforwardコールをtry-catchブロックでラップして、後続のリンクが投げるエラーを処理する。
+// Note: Apollo Clientはmiddlewareを使っていますが、チェーンの概念は似ています。
+// middlewareはリンク間で操作を渡す複雑さがあるため、今回はシンプルさを重視して再帰(recursion)を使いました。
 
 interface Operation {
   query: string;
