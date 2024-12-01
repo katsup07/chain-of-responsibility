@@ -1,7 +1,6 @@
 // Chain of Responsibility Pattern
 
 // メインポイント
-// このファイルは、Chain of Responsibility Patternを示している。
 // 各リンク（AuthLink、ErrorLink、HttpLink）は、Operationオブジェクトを処理し、次のリンクに渡す。
 // LinkChainクラスは、これらのリンクを順番に実行する。
 // main関数では、AuthLink、ErrorLink、HttpLinkの順にリンクを設定し、Operationを実行する。
