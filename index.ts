@@ -95,8 +95,8 @@ class LinkChain {
 // Main - チェーンの実行
 const main = () => {
 
-const errorData = { isThrowAuthError: true }; // エラーの設定
-const chain = new LinkChain([new ErrorLink(), new AuthLink(errorData), new HttpLink()]); // チェーンの設定
+const authData = { isThrowAuthError: true }; // エラーの設定
+const chain = new LinkChain([new ErrorLink(), new AuthLink(authData), new HttpLink()]); // チェーンの設定
 
 const operation = { query: "Some GraphQL Query" };
 

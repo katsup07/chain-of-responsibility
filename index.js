@@ -1,5 +1,4 @@
-// Note: 複雑な所は、polymorphism, recursion, and chain of responsibilityの実装である。理解できないなら、
-// それぞれの概念を学ぶ必要があるかもしれない。使っているところでコメントを残しているので、それを参考にしてください。
+// Chain of Responsibility Pattern
 var ErrorLink = /** @class */ (function () {
     function ErrorLink() {
     }
@@ -34,6 +33,7 @@ var HttpLink = /** @class */ (function () {
     function HttpLink() {
     }
     HttpLink.prototype.execute = function (operation, forward) {
+        console.log("[HttpLink] Running execute...");
         console.log("[HttpLink]: Request sent with query \"".concat(operation.query, "\""));
         return { data: "Query was processed successfully" };
     };
@@ -49,28 +49,39 @@ var LinkChain = /** @class */ (function () {
             if (index >= _this.links.length)
                 return null;
             var link = _this.links[index]; // 例: [(0) errorLink , (1) authLink , (2) httpLink]
-            var forward = function (nextOp) { return executeChain(index + 1, nextOp); }; //次のリンクに処理を渡すための再帰的なコールバック
+            var forward = function (nextOp) { return executeChain(index + 1, nextOp); }; //再帰的なコールバック
             return link.execute(op, forward); //ポリモーフィズムで各リンクのexecuteメソッドが呼ばれる
         };
         return executeChain(0, operation);
     };
     return LinkChain;
 }());
+// 例のケース
+// 1.  const errorData = { isThrowAuthError: true };
+// const chain = new LinkChain([new AuthLink(errorData), new ErrorLink(), new HttpLink()]); 
+// 結果: ErrorLinkがエラーをキャッチできない。エラーがmain関数まで伝播する。AuthLinkがErrorLinkの前にあるので、ErrorLinkは処理できない。
+// 2. const errorData = { isThrowAuthError: true };
+// const chain = new LinkChain([new ErrorLink(), new AuthLink(errorData), new HttpLink()]); 
+// 結果: ErrorLinkがエラーをキャッチで処理できる。理由、ErrorLinkがAuthLinkの前にあるため、エラーがErrorLinkに渡る。
+// リンクの順番が重要であることを示している。エラーをキャッチするリンクは、他のリンクの前に配置する必要がある。
+// 3. const errorData = { isThrowAuthError: false };　// エラーを発生させない場合
+// 結果: AuthLinkがエラーを投げないため、HttpLinkが実行される。
+// Video - https://www.youtube.com/watch?v=4yG2YBAsaYY
 // Main - チェーンの実行
 var main = function () {
-    var errorData = { isThrowAuthError: true }; // ここでエラーを発生させるかどうかを設定する
-    var chain = new LinkChain([new ErrorLink(), new AuthLink(errorData), new HttpLink()]); // チェーンの設定
+    var authData = { isThrowAuthError: true }; // エラーの設定
+    var chain = new LinkChain([new ErrorLink(), new AuthLink(authData), new HttpLink()]); // チェーンの設定
     var operation = { query: "Some GraphQL Query" };
     try {
         var result = chain.execute(operation);
-        // チェーン内でエラーが発生した場合、エラーをキャッチしてログに出力する
+        // チェーン内でエラーがキャッチされた場合
         if (result && result.error)
-            console.log("[Main] Error safely handled: ".concat(result.error));
+            console.log("[Main] Error handled in LinkChain: ".concat(result.error));
         else
             console.log("[Main] Result: ".concat(JSON.stringify(result)));
     }
     catch (error) {
-        // チェーン内でエラーがキャッチされなかった場合、エラーをキャッチしてログに出力する。
+        // チェーン内でエラーがキャッチされなかった場合
         console.error("[Main]: Error was not handled in LinkChain and propagated to main. Error: ".concat(error.message));
     }
 };
